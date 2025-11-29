@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">PrecioScan</string>
+    <string name="precio_scan">Precio Scan</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="iniciar_session">Iniciar Sesión</string>
+    <string name="registrarse">Registrarse</string>
+    <string name="appicon">AppIcon</string>
+    <string name="title_activity_main">Main Activity</string>
+    <string name="title_activity_login">Login Activity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="product_image">Product descripton</string>
+    <string name="productName">Nombre del producto</string>
+    <string name="available_stores">Tiendas Disponibles</string>
+    <string name="suggested_products">Productos sugeridos</string>
+    <string name='store_name'>Nombre de tienda</string>
+    <string name="removeSelectedStore">Remover tienda seleccionada</string>
+    <string name="placeholderselectedstore">Searching By SelectedStore</string>
+    <string name="remover">Remover</string>
+    <string name="title_activity_search_results">Resultados</string>
+</resources>
