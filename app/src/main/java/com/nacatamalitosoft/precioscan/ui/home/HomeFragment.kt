@@ -12,7 +12,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.nacatamalitosoft.precioscan.SearchResultsActivity
+import com.nacatamalitosoft.precioscan.LoginActivity
+import com.nacatamalitosoft.precioscan.R
+import com.nacatamalitosoft.precioscan.ui.home.ProductDetailActivity
+import com.nacatamalitosoft.precioscan.ui.home.SearchResultsActivity
 import com.nacatamalitosoft.precioscan.databinding.FragmentHomeBinding
 import com.nacatamalitosoft.precioscan.lib.ApiErrorHandler
 import com.nacatamalitosoft.precioscan.lib.ApiService
@@ -34,11 +37,7 @@ class HomeFragment : Fragment(), ApiErrorHandler {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val homeViewModel =
             ViewModelProvider(this)[HomeViewModel::class.java]
 
@@ -52,7 +51,11 @@ class HomeFragment : Fragment(), ApiErrorHandler {
         storeRepository = StoreRepository(apiService, this)
 
         // Configurar RecyclerView Productos
-        productsAdapter = ProductsAdapter(emptyList())
+        productsAdapter = ProductsAdapter({ product ->
+            val intent = Intent(requireContext(), ProductDetailActivity::class.java)
+            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, product.id);
+            startActivity(intent)
+        },emptyList())
         binding.rvHomeProducts.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         binding.rvHomeProducts.adapter = productsAdapter
 
@@ -64,20 +67,18 @@ class HomeFragment : Fragment(), ApiErrorHandler {
         binding.rvStores.adapter = storeAdapter
 
         loadData()
-        // Configurar la visibilidad de la tienda seleccionada
         homeViewModel.store.observe(viewLifecycleOwner) { store ->
             binding.homeSelectedStore.animate()
                 .alpha(if (store.isNullOrEmpty()) 0f else 1f)
                 .setDuration(200)
                 .withEndAction {
                     binding.homeSelectedStore.visibility = if (store.isNullOrEmpty()) View.GONE else View.VISIBLE
-                    binding.selectedStore.text = store
+                    binding.selectedStore.text = getString(R.string.buscando_en, store)
                 }
         }
         binding.txtRemoverTienda.setOnClickListener {
             homeViewModel.setStore(String())
         }
-        // Configurar busqueda
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let { q ->
@@ -97,11 +98,11 @@ class HomeFragment : Fragment(), ApiErrorHandler {
                 return true
             }
         })
-
         return root
     }
 
     private fun loadData() {
+        binding.loadingProducts.visibility = View.VISIBLE
         lifecycleScope.launch {
             // Cargar productos
             val products = productRepository.getRandomProducts()
@@ -110,6 +111,7 @@ class HomeFragment : Fragment(), ApiErrorHandler {
             // Cargar tiendas
             val stores = storeRepository.getStores()
             storeAdapter.updateList(stores)
+            binding.loadingProducts.visibility = View.GONE
         }
     }
 
@@ -119,7 +121,10 @@ class HomeFragment : Fragment(), ApiErrorHandler {
     }
 
     override fun onUnauthorized() {
-        Toast.makeText(context, "Sesión expirada", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, getString(R.string.expired_session), Toast.LENGTH_SHORT).show()
+        val intent = Intent(requireContext(), LoginActivity::class.java)
+        startActivity(intent)
+        requireActivity().finish()
     }
 
     override fun onNetworkError(msg: String) {

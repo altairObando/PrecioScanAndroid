@@ -13,13 +13,18 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.nacatamalitosoft.precioscan.ui.dashboard.DashboardFragment"
+        android:name="com.nacatamalitosoft.precioscan.ui.favorites.FavoritesFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_favorites" />
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.nacatamalitosoft.precioscan.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.nacatamalitosoft.precioscan.ui.profile.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
 </navigation>

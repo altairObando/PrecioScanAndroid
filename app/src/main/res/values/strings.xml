@@ -8,9 +8,9 @@
     <string name="appicon">AppIcon</string>
     <string name="title_activity_main">Main Activity</string>
     <string name="title_activity_login">Login Activity</string>
-    <string name="title_home">Home</string>
+    <string name="title_home">Productos</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_notifications">Notificaciones</string>
     <string name="product_image">Product descripton</string>
     <string name="productName">Nombre del producto</string>
     <string name="available_stores">Tiendas Disponibles</string>
@@ -20,4 +20,16 @@
     <string name="placeholderselectedstore">Searching By SelectedStore</string>
     <string name="remover">Remover</string>
     <string name="title_activity_search_results">Resultados</string>
+    <string name="related_products">Productos relacionados</string>
+    <string name="product_detail">Detalle del Producto</string>
+    <string name="product_not_valid">Producto no válido</string>
+    <string name="agregado_a_favoritos">Agregado a favoritos</string>
+    <string name="title_favs">Favoritos</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_profile">Perfil</string>
+    <string name="buscando_en">Buscando en %1$s</string>
+    <string name="expired_session">Sesión expirada</string>
+    <string name="logged_required">Para continuar debes iniciar sesion</string>
+    <string name="login">Iniciar Sesión</string>
 </resources>

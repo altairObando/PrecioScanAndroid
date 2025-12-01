@@ -19,7 +19,7 @@ class StoreAdapter(
             binding.storeName.text = store.name
             Glide.with(binding.root.context)
                 .load(store.logoUrl)
-                .centerCrop()
+                .centerInside()
                 .into(binding.storeLogo)
 
             binding.root.setOnClickListener {

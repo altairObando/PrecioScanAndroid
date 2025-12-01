@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide
 import com.nacatamalitosoft.precioscan.databinding.ProductsCardItemBinding
 import com.nacatamalitosoft.precioscan.models.StoreProduct
 
-class ProductsAdapter(private var products: List<StoreProduct>) :
+class ProductsAdapter(private val onProductPress: (product: StoreProduct) -> Unit ,private var products: List<StoreProduct>) :
     RecyclerView.Adapter<ProductsAdapter.ProductViewHolder>() {
 
     inner class ProductViewHolder(val binding: ProductsCardItemBinding) :
@@ -26,11 +26,14 @@ class ProductsAdapter(private var products: List<StoreProduct>) :
         val product = products[position]
         with(holder.binding) {
             productName.text = product.name
-            productPrice.text = "$${product.price}"
+            ("$" + product.price).also { productPrice.text = it }
             Glide.with(holder.itemView.context)
                 .load(product.imageUrl)
                 .centerCrop()
                 .into(productImage)
+            root.setOnClickListener {
+                onProductPress(product)
+            }
         }
     }
 

@@ -28,9 +28,14 @@
             android:exported="false"
             android:label="@string/title_activity_login" />
         <activity
-            android:name=".SearchResultsActivity"
+            android:name=".ui.home.SearchResultsActivity"
             android:exported="false"
             android:label="@string/title_activity_search_results"
+            android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".ui.home.ProductDetailActivity"
+            android:exported="false"
+            android:label="Detalle de Producto"
             android:parentActivityName=".MainActivity"/>
     </application>
 

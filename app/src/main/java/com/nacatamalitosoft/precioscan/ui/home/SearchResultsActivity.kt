@@ -1,5 +1,6 @@
-package com.nacatamalitosoft.precioscan
+package com.nacatamalitosoft.precioscan.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -32,7 +33,11 @@ class SearchResultsActivity : AppCompatActivity(), ApiErrorHandler {
         val apiService = createRetrofit(this).create(ApiService::class.java)
         repository = ProductRepository(apiService, this)
 
-        adapter = SearchResultsAdapter(emptyList())
+        adapter = SearchResultsAdapter({ product ->
+            val intent = Intent(this, ProductDetailActivity::class.java)
+            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, product.id)
+            startActivity(intent)
+        }, emptyList())
         binding.rvSearchResults.layoutManager = LinearLayoutManager(this)
         binding.rvSearchResults.adapter = adapter
 
@@ -45,11 +50,11 @@ class SearchResultsActivity : AppCompatActivity(), ApiErrorHandler {
     private fun searchProducts(query: String, store: String?) {
         binding.progressBar.visibility = View.VISIBLE
         binding.tvEmpty.visibility = View.GONE
-        
+
         lifecycleScope.launch {
             val products = repository.searchProducts(query, store)
             binding.progressBar.visibility = View.GONE
-            
+
             if (products.isEmpty()) {
                 binding.tvEmpty.visibility = View.VISIBLE
                 adapter.updateList(emptyList())

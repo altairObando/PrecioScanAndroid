@@ -52,6 +52,7 @@ class LoginActivity : AppCompatActivity() {
         when( val response = safeApiCall { api.login(request) }){
             is Result.Success -> {
                 Toast.makeText(this, "Welcome ${response.data.user.username}", Toast.LENGTH_SHORT).show()
+                TokenManager.saveTokens(this, response.data.tokens.access, response.data.tokens.refresh)
             }
             is Result.Error -> {
                 if(response.code == 401) TokenManager.clearTokens(this)
