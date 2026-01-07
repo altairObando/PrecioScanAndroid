@@ -26,7 +26,7 @@ class ProductsAdapter(private val onProductPress: (product: StoreProduct) -> Uni
         val product = products[position]
         with(holder.binding) {
             productName.text = product.name
-            ("$" + product.price).also { productPrice.text = it }
+            ("C$" + product.price).also { productPrice.text = it }
             Glide.with(holder.itemView.context)
                 .load(product.imageUrl)
                 .centerCrop()

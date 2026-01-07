@@ -1,5 +1,6 @@
 package com.nacatamalitosoft.precioscan.lib
 import android.content.Context
+import com.nacatamalitosoft.precioscan.BuildConfig
 import com.nacatamalitosoft.precioscan.lib.helpers.AuthInterceptor
 import com.nacatamalitosoft.precioscan.lib.helpers.TokenManager
 import com.nacatamalitosoft.precioscan.models.RefreshRequest
@@ -13,7 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 fun createRetrofit(context: Context): Retrofit {
-    val baseUrl = "http://192.168.1.102:8000/api/";
+    val baseUrl = BuildConfig.API_URL;
     val client = OkHttpClient.Builder()
         .addInterceptor(AuthInterceptor(context))
         .authenticator(object : Authenticator {

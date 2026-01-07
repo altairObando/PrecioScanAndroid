@@ -6,7 +6,7 @@
     <string name="iniciar_session">Iniciar Sesión</string>
     <string name="registrarse">Registrarse</string>
     <string name="appicon">AppIcon</string>
-    <string name="title_activity_main">Main Activity</string>
+    <string name="title_activity_main">PrecioScan</string>
     <string name="title_activity_login">Login Activity</string>
     <string name="title_home">Productos</string>
     <string name="title_dashboard">Dashboard</string>

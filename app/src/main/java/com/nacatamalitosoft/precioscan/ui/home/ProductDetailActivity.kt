@@ -27,6 +27,7 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
 
     companion object {
         const val EXTRA_PRODUCT_ID = "extra_product_id"
+        const val EXTRA_FAV_ID = "fav_id"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

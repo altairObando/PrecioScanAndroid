@@ -14,7 +14,7 @@
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.nacatamalitosoft.precioscan.ui.favorites.FavoritesFragment"
-        android:label="@string/title_dashboard"
+        android:label="@string/title_favs"
         tools:layout="@layout/fragment_favorites" />
 
     <fragment
