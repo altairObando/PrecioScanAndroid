@@ -5,6 +5,7 @@ import com.nacatamalitosoft.precioscan.lib.ApiService
 import com.nacatamalitosoft.precioscan.lib.helpers.safeApiCall
 import com.nacatamalitosoft.precioscan.lib.helpers.Result
 import com.nacatamalitosoft.precioscan.models.Favorites
+import com.nacatamalitosoft.precioscan.models.FavoritesPost
 
 class FavRepository (private val api: ApiService, private val errorHandler: ApiErrorHandler) {
     suspend fun get() : List<Favorites> {
@@ -15,6 +16,25 @@ class FavRepository (private val api: ApiService, private val errorHandler: ApiE
                 else errorHandler.onNetworkError(result.message)
                 emptyList()
             }
+        }
+    }
+    suspend fun add( product: Int): Boolean {
+        val fav = FavoritesPost(product = product)
+        return when(val result = safeApiCall { api.addFavorite(fav) }) {
+            is Result.Success -> {
+                result.data
+                true
+            }
+            is Result.Error -> {
+                print(result.message)
+                false
+            }
+        }
+    }
+    suspend fun isFavorite( product: Int): Boolean {
+        return when(val result = safeApiCall { api.isFavorite(product) }){
+            is Result.Success -> result.data.isFavorite
+            is Result.Error ->  false
         }
     }
 }

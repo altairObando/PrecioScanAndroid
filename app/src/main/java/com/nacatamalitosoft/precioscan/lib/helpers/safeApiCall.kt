@@ -7,7 +7,8 @@ sealed class Result<out T> {
     data class Error(val message: String, val code: Int? = null) : Result<Nothing>()
 }
 data class ApiError(
-    val error: String
+    val error: String?,
+    val detail: String
 )
 
 suspend fun <T> safeApiCall(apiCall: suspend () -> T): Result<T> {
@@ -19,7 +20,7 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> T): Result<T> {
         val message = try {
             val gson = com.google.gson.Gson()
             val apiError = gson.fromJson(errorBody, ApiError::class.java)
-            apiError.error
+            apiError.error ?: apiError.detail
         } catch (ex: Exception) {
             errorBody ?: "Error HTTP: ${e.code()}"
         }

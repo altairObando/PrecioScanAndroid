@@ -1,5 +1,7 @@
 package com.nacatamalitosoft.precioscan.lib
 import com.nacatamalitosoft.precioscan.models.Favorites
+import com.nacatamalitosoft.precioscan.models.FavoritesPost
+import com.nacatamalitosoft.precioscan.models.IsFavoriteResponse
 import com.nacatamalitosoft.precioscan.models.LoginRequest
 import com.nacatamalitosoft.precioscan.models.LoginResponse
 import com.nacatamalitosoft.precioscan.models.RefreshRequest
@@ -33,9 +35,11 @@ interface ApiService {
     suspend fun getStores(): List<Store>
     // Favorites
     @POST("favorites/")
-    suspend fun addFavorite(@Body product: Int): Favorites
+    suspend fun addFavorite(@Body product: FavoritesPost): Favorites
     @DELETE("favorites/{id}/")
     suspend fun deleteFavorite(@Path("id") id: Int)
+    @GET("favorites/isFavorite/")
+    suspend fun isFavorite(@Query("pk") pk: Int) : IsFavoriteResponse
     @GET("favorites/")
     suspend fun getFavorite(): List<Favorites>
 }

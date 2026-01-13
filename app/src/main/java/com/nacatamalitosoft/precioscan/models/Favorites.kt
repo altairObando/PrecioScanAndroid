@@ -10,3 +10,9 @@ data class Favorites(
     @SerializedName("created_at")
     val createdAt: String
 )
+data class FavoritesPost(
+    val product: Int
+)
+data class IsFavoriteResponse(
+    val isFavorite: Boolean
+)

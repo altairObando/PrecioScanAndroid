@@ -108,8 +108,8 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Favoritos"
-                                app:icon="@android:drawable/btn_star"
+                                android:text="@string/favoritos"
+                                app:icon="@android:drawable/btn_star_big_off"
                                 app:iconGravity="textTop" />
 
                             <com.google.android.material.button.MaterialButton

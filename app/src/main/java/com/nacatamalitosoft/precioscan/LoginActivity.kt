@@ -62,5 +62,6 @@ class LoginActivity : AppCompatActivity() {
         btnLogin.isEnabled = true;
         btnLogin.alpha = 1f;
         progress.visibility = ProgressBar.INVISIBLE;
+        finish();
     }
 }

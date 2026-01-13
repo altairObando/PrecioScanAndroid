@@ -13,6 +13,7 @@ import com.nacatamalitosoft.precioscan.databinding.ActivityProductDetailBinding
 import com.nacatamalitosoft.precioscan.lib.ApiErrorHandler
 import com.nacatamalitosoft.precioscan.lib.ApiService
 import com.nacatamalitosoft.precioscan.lib.createRetrofit
+import com.nacatamalitosoft.precioscan.lib.repo.FavRepository
 import com.nacatamalitosoft.precioscan.lib.repo.ProductRepository
 import com.nacatamalitosoft.precioscan.models.StoreProduct
 import com.nacatamalitosoft.precioscan.ui.adapters.SearchResultsAdapter
@@ -24,6 +25,7 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
     private lateinit var repository: ProductRepository
     private lateinit var relatedProductsAdapter: SearchResultsAdapter
     private var currentProduct: StoreProduct? = null
+    private lateinit var favRepository: FavRepository
 
     companion object {
         const val EXTRA_PRODUCT_ID = "extra_product_id"
@@ -41,6 +43,7 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
 
         val apiService = createRetrofit(this).create(ApiService::class.java)
         repository = ProductRepository(apiService, this)
+        favRepository = FavRepository(apiService, this)
 
         setupListeners()
         setupRecyclerView()
@@ -52,6 +55,7 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
             Toast.makeText(this, getString(R.string.product_not_valid), Toast.LENGTH_SHORT).show()
             finish()
         }
+        binding.btnFavorite.visibility = View.GONE
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -60,13 +64,10 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
     }
 
     private fun setupListeners() {
-        binding.btnFavorite.setOnClickListener {
-            Toast.makeText(this, getString(R.string.agregado_a_favoritos), Toast.LENGTH_SHORT).show()
-        }
+        binding.btnFavorite.setOnClickListener { addOrRemoveFav() }
 
         binding.btnShare.setOnClickListener {
             currentProduct?.let { product ->
-
                 val shareIntent = Intent().apply {
                     action = Intent.ACTION_SEND
                     type = "text/plain"
@@ -83,10 +84,11 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
 
     private fun setupRecyclerView() {
         relatedProductsAdapter = SearchResultsAdapter({ product ->
-            loadProduct(product.id)
+            val intent = Intent(this, ProductDetailActivity::class.java)
+            intent.putExtra(EXTRA_PRODUCT_ID, product.id)
+            startActivity(intent)
         }, emptyList())
         binding.rvRelatedProducts.adapter = relatedProductsAdapter
-        // Layout manager is set in XML
     }
 
     private fun loadProduct(id: Int) {
@@ -96,6 +98,7 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
                 currentProduct = product
                 displayProduct(product)
                 loadRelatedProducts(product.productId)
+                checkIsFavorite(product.id)
             } else {
                 Toast.makeText(this@ProductDetailActivity, "No se pudo cargar el producto", Toast.LENGTH_SHORT).show()
             }
@@ -119,6 +122,7 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
         "$ ${product.price}".also { binding.tvProductPrice.text = it }
         binding.tvProductAvailability.text = if (product.isAvailable) "Disponible" else "No disponible"
 
+
         Glide.with(this)
             .load(product.imageUrl)
             .placeholder(R.mipmap.ic_launcher)
@@ -135,5 +139,23 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
 
     override fun onNetworkError(msg: String) {
         Toast.makeText(this, "Error de red: $msg", Toast.LENGTH_SHORT).show()
+    }
+    private fun addOrRemoveFav(){
+        val productId: Int = currentProduct?.id ?: return
+        lifecycleScope.launch {
+            val added = favRepository.add( productId )
+            setIcon(added)
+        }
+    }
+    private fun setIcon(isFavorite: Boolean){
+        val iconId = if (isFavorite) android.R.drawable.btn_star_big_on else android.R.drawable.btn_star_big_off
+        binding.btnFavorite.setIconResource(iconId)
+    }
+    private fun checkIsFavorite( productId: Int){
+        binding.btnFavorite.visibility = View.VISIBLE
+        lifecycleScope.launch {
+            val isFav = favRepository.isFavorite(productId)
+            setIcon(isFav)
+        }
     }
 }
