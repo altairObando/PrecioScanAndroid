@@ -14,8 +14,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nacatamalitosoft.precioscan.LoginActivity
 import com.nacatamalitosoft.precioscan.R
-import com.nacatamalitosoft.precioscan.ui.home.ProductDetailActivity
-import com.nacatamalitosoft.precioscan.ui.home.SearchResultsActivity
 import com.nacatamalitosoft.precioscan.databinding.FragmentHomeBinding
 import com.nacatamalitosoft.precioscan.lib.ApiErrorHandler
 import com.nacatamalitosoft.precioscan.lib.ApiService
@@ -32,19 +30,16 @@ class HomeFragment : Fragment(), ApiErrorHandler {
     private lateinit var storeRepository: StoreRepository
     private lateinit var productsAdapter: ProductsAdapter
     private lateinit var storeAdapter: StoreAdapter
+    private lateinit var homeViewModel: HomeViewModel
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val homeViewModel =
-            ViewModelProvider(this)[HomeViewModel::class.java]
+        homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
         val apiService = createRetrofit(requireContext()).create(ApiService::class.java)
-        // Ocultar tienda seleccionada
         binding.homeSelectedStore.visibility = View.GONE
 
         productRepository = ProductRepository(apiService, this)
@@ -53,7 +48,7 @@ class HomeFragment : Fragment(), ApiErrorHandler {
         // Configurar RecyclerView Productos
         productsAdapter = ProductsAdapter({ product ->
             val intent = Intent(requireContext(), ProductDetailActivity::class.java)
-            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, product.id);
+            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, product.id)
             startActivity(intent)
         },emptyList())
         binding.rvHomeProducts.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -83,11 +78,18 @@ class HomeFragment : Fragment(), ApiErrorHandler {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let { q ->
                     val intent = Intent(requireContext(), SearchResultsActivity::class.java)
-                    intent.putExtra("query", q)
-                    homeViewModel.store.value?.let { storeName ->
-                        if (storeName.isNotEmpty()) {
-                            intent.putExtra("store", storeName)
+                    intent.putExtra(SearchResultsActivity.EXTRA_QUERY, q)
+                    val storeName = homeViewModel.store.value
+                    if (storeName != null && storeName.isNotEmpty()){
+                        intent.putExtra(SearchResultsActivity.EXTRA_STORE, storeName)
+                    }else{
+                        var names = ""
+                        homeViewModel.stores.value?.forEach { ixStore ->
+                            if ( names.isNotEmpty())
+                                names = names.plus(",")
+                            names = names.plus(ixStore.code)
                         }
+                        print(names)
                     }
                     startActivity(intent)
                 }
@@ -98,20 +100,34 @@ class HomeFragment : Fragment(), ApiErrorHandler {
                 return true
             }
         })
+        binding.refreshContainer.setOnRefreshListener {
+            homeViewModel.setProducts(emptyList())
+            homeViewModel.setStores(emptyList())
+            loadData()
+        }
         return root
     }
 
     private fun loadData() {
-        binding.loadingProducts.visibility = View.VISIBLE
+
+        binding.refreshContainer.isRefreshing = true
         lifecycleScope.launch {
             // Cargar productos
-            val products = productRepository.getRandomProducts()
-            productsAdapter.updateList(products)
-
-            // Cargar tiendas
-            val stores = storeRepository.getStores()
-            storeAdapter.updateList(stores)
-            binding.loadingProducts.visibility = View.GONE
+            if ( homeViewModel.suggestedProducts.value == null || (homeViewModel.suggestedProducts.value?.isEmpty() == true)){
+                val products = productRepository.getRandomProducts()
+                productsAdapter.updateList(products)
+                homeViewModel.setProducts(products)
+            } else {
+                productsAdapter.updateList(homeViewModel.suggestedProducts.value?: emptyList())
+            }
+            if( homeViewModel.stores.value == null || (homeViewModel.stores.value?.isEmpty() == true)){
+                val stores = storeRepository.getStores()
+                storeAdapter.updateList(stores)
+                homeViewModel.setStores(stores)
+            }else{
+                storeAdapter.updateList(homeViewModel.stores.value?: emptyList())
+            }
+            binding.refreshContainer.isRefreshing = false
         }
     }
 

@@ -26,9 +26,16 @@ class FavRepository (private val api: ApiService, private val errorHandler: ApiE
                 true
             }
             is Result.Error -> {
+                errorHandler.onNetworkError(result.message)
                 print(result.message)
                 false
             }
+        }
+    }
+    suspend fun remove(id: Int){
+        return when(val result = safeApiCall { api.deleteFavorite(id) }){
+            is Result.Success -> result.data
+            is Result.Error -> errorHandler.onNetworkError(result.message)
         }
     }
     suspend fun isFavorite( product: Int): Boolean {

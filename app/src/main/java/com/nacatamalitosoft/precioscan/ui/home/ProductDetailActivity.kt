@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.nacatamalitosoft.precioscan.LoginActivity
@@ -24,16 +25,17 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
     private lateinit var binding: ActivityProductDetailBinding
     private lateinit var repository: ProductRepository
     private lateinit var relatedProductsAdapter: SearchResultsAdapter
-    private var currentProduct: StoreProduct? = null
     private lateinit var favRepository: FavRepository
+    private lateinit var productViewModel: ProductViewModel
+
 
     companion object {
         const val EXTRA_PRODUCT_ID = "extra_product_id"
-        const val EXTRA_FAV_ID = "fav_id"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        productViewModel = ViewModelProvider(this)[ProductViewModel::class.java]
         binding = ActivityProductDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -48,14 +50,29 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
         setupListeners()
         setupRecyclerView()
 
+        binding.btnFavorite.visibility = View.GONE
+        productViewModel.isFavorite.observe(this){ isFavorite ->
+            binding.btnFavorite.animate()
+                .withEndAction { setIcon(isFavorite) }
+        }
+        productViewModel.product.observe(this){ product ->
+            if(product != null)
+                displayProduct(product)
+        }
+        productViewModel.relatedProducts.observe(this){ related ->
+            if( related != null && related.isNotEmpty())
+                relatedProductsAdapter.updateList(related)
+        }
+
         val productId = intent.getIntExtra(EXTRA_PRODUCT_ID, -1)
         if (productId != -1) {
-            loadProduct(productId)
+            if (productViewModel.product.value == null) {
+                loadProduct(productId)
+            }
         } else {
             Toast.makeText(this, getString(R.string.product_not_valid), Toast.LENGTH_SHORT).show()
             finish()
         }
-        binding.btnFavorite.visibility = View.GONE
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -67,7 +84,7 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
         binding.btnFavorite.setOnClickListener { addOrRemoveFav() }
 
         binding.btnShare.setOnClickListener {
-            currentProduct?.let { product ->
+            productViewModel.product.value?.let { product ->
                 val shareIntent = Intent().apply {
                     action = Intent.ACTION_SEND
                     type = "text/plain"
@@ -95,7 +112,7 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
         lifecycleScope.launch {
             val product = repository.getProductById(id)
             if (product != null) {
-                currentProduct = product
+                productViewModel.setProduct( product )
                 displayProduct(product)
                 loadRelatedProducts(product.productId)
                 checkIsFavorite(product.id)
@@ -141,10 +158,10 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
         Toast.makeText(this, "Error de red: $msg", Toast.LENGTH_SHORT).show()
     }
     private fun addOrRemoveFav(){
-        val productId: Int = currentProduct?.id ?: return
+        val productId: Int = productViewModel.product.value?.id ?: return
         lifecycleScope.launch {
             val added = favRepository.add( productId )
-            setIcon(added)
+            productViewModel.setIsFavorite(added)
         }
     }
     private fun setIcon(isFavorite: Boolean){
@@ -155,7 +172,7 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
         binding.btnFavorite.visibility = View.VISIBLE
         lifecycleScope.launch {
             val isFav = favRepository.isFavorite(productId)
-            setIcon(isFav)
+            productViewModel.setIsFavorite(isFav)
         }
     }
 }

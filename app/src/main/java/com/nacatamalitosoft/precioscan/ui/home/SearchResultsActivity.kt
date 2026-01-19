@@ -21,6 +21,10 @@ class SearchResultsActivity : AppCompatActivity(), ApiErrorHandler {
     private lateinit var repository: ProductRepository
     private lateinit var adapter: SearchResultsAdapter
 
+    companion object {
+        const val EXTRA_QUERY = "extra_query"
+        const val EXTRA_STORE = "extra_store"
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchResultsBinding.inflate(layoutInflater)
@@ -41,8 +45,8 @@ class SearchResultsActivity : AppCompatActivity(), ApiErrorHandler {
         binding.rvSearchResults.layoutManager = LinearLayoutManager(this)
         binding.rvSearchResults.adapter = adapter
 
-        val query = intent.getStringExtra("query") ?: ""
-        val store = intent.getStringExtra("store")
+        val query = intent.getStringExtra(EXTRA_QUERY) ?: ""
+        val store = intent.getStringExtra(EXTRA_STORE)
 
         searchProducts(query, store)
     }
