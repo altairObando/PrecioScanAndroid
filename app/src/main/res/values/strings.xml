@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">PrecioScan</string>
     <string name="precio_scan">Precio Scan</string>
-    <string name="email">Email</string>
+    <string name="email">Correo Electrónico</string>
     <string name="password">Password</string>
     <string name="iniciar_session">Iniciar Sesión</string>
     <string name="registrarse">Registrarse</string>
@@ -33,4 +33,17 @@
     <string name="logged_required">Para continuar debes iniciar sesion</string>
     <string name="login">Iniciar Sesión</string>
     <string name="favoritos">Favoritos</string>
+    <string name="user_icon">User icon</string>
+    <string name="datos_del_usuario">Datos del usuario</string>
+    <string name="informacion_personal">Información Personal</string>
+    <string name="nombres_label">Nombres</string>
+    <string name="dummy_name">Jhonn Doe</string>
+    <string name="email_icon">Email Icon</string>
+    <string name="dummy_mail">ejemplo@dominio.com</string>
+    <string name="phone_icon">Phone Icon</string>
+    <string name="telefono">Telefono</string>
+    <string name="dummy_phone">+505 1234 5678</string>
+    <string name="actualizar_datos">Actualizar Datos</string>
+    <string name="cambiar_clave">Cambiar Contraseña</string>
+    <string name="cerrar_sesion">Cerrar Sesión</string>
 </resources>

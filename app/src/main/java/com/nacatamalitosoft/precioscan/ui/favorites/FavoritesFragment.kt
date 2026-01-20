@@ -49,7 +49,7 @@ class FavoritesFragment : Fragment(), ApiErrorHandler {
         loadFavs()
 
         binding.notLoggedInLayout.btnGoToLogin.setOnClickListener { openLogin() }
-
+        binding.refreshContainer.setOnRefreshListener { loadFavs() }
         return root
     }
 
@@ -60,6 +60,7 @@ class FavoritesFragment : Fragment(), ApiErrorHandler {
 
     private fun loadFavs() {
         lifecycleScope.launch {
+            binding.refreshContainer.isRefreshing = true
             val myFavs = repo.get()
 
             // Hide everything first
@@ -73,6 +74,7 @@ class FavoritesFragment : Fragment(), ApiErrorHandler {
                 binding.contentLayout.visibility = View.VISIBLE
                 adapter.updateList(myFavs)
             }
+            binding.refreshContainer.isRefreshing = false
         }
     }
 

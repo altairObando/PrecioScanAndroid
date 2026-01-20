@@ -2,4 +2,6 @@
 <resources>
     <string name="product_image">Product descripton</string>
     <string name="productName">Nombre del producto</string>
+    <string name="nombres_label">Nombres</string>
+    <string name="dummy_mail">ejemplo@dominio.com</string>
 </resources>

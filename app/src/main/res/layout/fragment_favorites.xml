@@ -13,12 +13,17 @@
         android:orientation="vertical"
         android:id="@+id/contentLayout">
         
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvFavorites"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_search_product"/>
+            android:id="@+id/refreshContainer">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvFavorites"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_search_product"/>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
             
     </LinearLayout>
 
