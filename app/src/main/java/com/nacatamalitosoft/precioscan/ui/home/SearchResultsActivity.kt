@@ -2,6 +2,7 @@ package com.nacatamalitosoft.precioscan.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +13,7 @@ import com.nacatamalitosoft.precioscan.lib.ApiErrorHandler
 import com.nacatamalitosoft.precioscan.lib.ApiService
 import com.nacatamalitosoft.precioscan.lib.createRetrofit
 import com.nacatamalitosoft.precioscan.lib.repo.ProductRepository
+import com.nacatamalitosoft.precioscan.models.StoreProduct
 import com.nacatamalitosoft.precioscan.ui.adapters.SearchResultsAdapter
 import kotlinx.coroutines.launch
 
@@ -41,7 +43,7 @@ class SearchResultsActivity : AppCompatActivity(), ApiErrorHandler {
             val intent = Intent(this, ProductDetailActivity::class.java)
             intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, product.id)
             startActivity(intent)
-        }, emptyList())
+        })
         binding.rvSearchResults.layoutManager = LinearLayoutManager(this)
         binding.rvSearchResults.adapter = adapter
 
@@ -51,19 +53,34 @@ class SearchResultsActivity : AppCompatActivity(), ApiErrorHandler {
         searchProducts(query, store)
     }
 
-    private fun searchProducts(query: String, store: String?) {
+    private fun searchProducts(query: String, stores: String?) {
         binding.progressBar.visibility = View.VISIBLE
         binding.tvEmpty.visibility = View.GONE
 
-        lifecycleScope.launch {
-            val products = repository.searchProducts(query, store)
-            binding.progressBar.visibility = View.GONE
+        val listaAcumulada = mutableListOf<StoreProduct>()
+        adapter.submitList(emptyList())
 
-            if (products.isEmpty()) {
-                binding.tvEmpty.visibility = View.VISIBLE
-                adapter.updateList(emptyList())
-            } else {
-                adapter.updateList(products)
+
+        val storeList : List<String> = (stores?:"").split(",")
+        var peticionesFinalizadas = 0
+
+        storeList.forEach { storeName ->
+            lifecycleScope.launch {
+                try {
+                    val products = repository.searchProducts(query, storeName.trim())
+                    if (products.isNotEmpty()) {
+                        listaAcumulada.addAll(products)
+                        adapter.submitList(listaAcumulada.toList())
+                    }
+                } catch (e: Exception) {
+                    Log.e("Search", "Error en tienda $storeName: ${e.message}")
+                } finally {
+                    peticionesFinalizadas++
+                    if (peticionesFinalizadas == storeList.size) {
+                        binding.progressBar.visibility = View.GONE
+                        if (listaAcumulada.isEmpty()) binding.tvEmpty.visibility = View.VISIBLE
+                    }
+                }
             }
         }
     }

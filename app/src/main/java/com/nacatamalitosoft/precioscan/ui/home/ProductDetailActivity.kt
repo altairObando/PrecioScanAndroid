@@ -61,7 +61,7 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
         }
         productViewModel.relatedProducts.observe(this){ related ->
             if( related != null && related.isNotEmpty())
-                relatedProductsAdapter.updateList(related)
+                relatedProductsAdapter.submitList(related)
         }
 
         val productId = intent.getIntExtra(EXTRA_PRODUCT_ID, -1)
@@ -104,7 +104,7 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
             val intent = Intent(this, ProductDetailActivity::class.java)
             intent.putExtra(EXTRA_PRODUCT_ID, product.id)
             startActivity(intent)
-        }, emptyList())
+        })
         binding.rvRelatedProducts.adapter = relatedProductsAdapter
     }
 
@@ -126,7 +126,7 @@ class ProductDetailActivity : AppCompatActivity(), ApiErrorHandler {
         lifecycleScope.launch {
             val relatedProducts = repository.getRelatedProducts(productId)
             if (relatedProducts.isNotEmpty()) {
-                relatedProductsAdapter.updateList(relatedProducts)
+                relatedProductsAdapter.submitList(relatedProducts)
             } else {
                 binding.rvRelatedProducts.visibility = View.GONE
             }
